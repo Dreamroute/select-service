@@ -5,6 +5,9 @@
 - JDK8+
 - IDE需要支持Lombok
 
+# 单元测试报告
+/test-converage目录
+
 # 用法
 - 分组(由于带有分组，返回值为Map类型)
 ```
