@@ -153,4 +153,10 @@ class SelectUtilTest {
         });
     }
 
+    @Test
+    void allParamTest() {
+        Map<Long, List<User>> result = SelectUtil.query(users, new Where().andEq("id", 1L), new OrderBy().column("id"), new Limit(2), new GroupBy("id"));
+        Assertions.assertEquals(1L, result.get(1L).get(0).getId());
+    }
+
 }

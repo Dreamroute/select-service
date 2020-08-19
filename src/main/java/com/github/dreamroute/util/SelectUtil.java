@@ -97,7 +97,7 @@ public class SelectUtil {
         return c;
     }
 
-    public static <T> boolean executeConditions(T e, Where where) {
+    private static <T> boolean executeConditions(T e, Where where) {
         if (where == null) {
             return true;
         }
