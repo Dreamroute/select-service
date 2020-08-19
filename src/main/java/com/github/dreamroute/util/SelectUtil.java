@@ -12,7 +12,6 @@ import org.apache.ibatis.reflection.invoker.Invoker;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -43,7 +42,6 @@ public class SelectUtil {
             }
         }
 
-        Comparator.comparing(e -> e)
 
         return data.stream()
                 .filter(e -> executeConditions(e, where))
