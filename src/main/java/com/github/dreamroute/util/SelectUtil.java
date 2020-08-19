@@ -6,15 +6,18 @@ import com.github.dreamroute.condition.In;
 import com.github.dreamroute.enums.Connector;
 import com.github.dreamroute.enums.Symbol;
 import com.github.dreamroute.others.OrderBy;
+import com.github.dreamroute.others.OrderBy.Order;
 import com.github.dreamroute.others.OrderBy.OrderInfo;
 import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.reflection.invoker.Invoker;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author w.dehai
@@ -32,20 +35,40 @@ public class SelectUtil {
             return Collections.emptyList();
         }
 
-        List<OrderInfo> orderInfos = orderBy.getOrderInfos();
-        if (orderInfos != null && !orderInfos.isEmpty()) {
-            for (OrderInfo orderInfo : orderInfos) {
-                data.sort((o1, o2) -> {
-                    Reflector r = new Reflector(o1.getClass());
-                    return 0;
-                });
-            }
+        Stream<T> stream = data.stream()
+                .filter(e -> executeConditions(e, where));
+
+        Comparator comparator = getComparator(orderBy);
+        if (comparator != null) {
+            stream = stream.sorted(comparator);
         }
 
+        return stream.collect(Collectors.toList());
+    }
 
-        return data.stream()
-                .filter(e -> executeConditions(e, where))
-                .collect(Collectors.toList());
+    private static <T> Comparator<T> getComparator(OrderBy orderBy) {
+        Comparator<T> c = null;
+        if (orderBy != null) {
+            List<OrderInfo> orderInfos = orderBy.getOrderInfos();
+            if (orderInfos != null && !orderInfos.isEmpty()) {
+                for (OrderInfo orderInfo : orderInfos) {
+                    Comparator cp = Comparator.comparing(e -> {
+                        Reflector r = new Reflector(e.getClass());
+                        try {
+                            return (Comparable) r.getGetInvoker(orderInfo.getColumn()).invoke(e, null);
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
+                        }
+                        return null;
+                    });
+                    if (orderInfo.getOrder() == Order.DESC) {
+                        cp = cp.reversed();
+                    }
+                    c = c == null ? cp : c.thenComparing(cp);
+                }
+            }
+        }
+        return c;
     }
 
     public static <T> boolean executeConditions(T e, Where where) {

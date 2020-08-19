@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SelectUtilTest {
 
@@ -126,7 +127,14 @@ public class SelectUtilTest {
 
     @Test
     public void orderByTest() {
-        List<User> result = SelectUtil.query(users, null, new OrderBy().column("id").column("name", Order.DESC));
+        // TODO 增加复杂测试
+        List<User> result = SelectUtil.query(users, null, new OrderBy().column("id", Order.DESC));
+        System.err.println(result);
+    }
+
+    @Test
+    public void limitTest() {
+        List<User> result = users.stream().limit(2).collect(Collectors.toList());
         System.err.println(result);
     }
 
