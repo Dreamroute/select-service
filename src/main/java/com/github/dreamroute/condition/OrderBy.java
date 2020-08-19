@@ -6,6 +6,6 @@ package com.github.dreamroute.condition;
 public class OrderBy {
 
     public static Object column(String id) {
-
+        return null;
     }
 }

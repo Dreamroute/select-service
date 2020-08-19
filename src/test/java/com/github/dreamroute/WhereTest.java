@@ -11,10 +11,6 @@ public class WhereTest {
 
     @Test
     public void mm() {
-        Where where = new Where();
-        where.eq("id", 1L).gt("id", 2L);
-
-        OrderBy orderBy = OrderBy.column("id").desc().column("name").asc();
     }
 
 }
