@@ -1,23 +1,27 @@
 package com.github.dreamroute.util;
 
 import com.github.dreamroute.domain.User;
+import com.github.dreamroute.others.GroupBy;
+import com.github.dreamroute.others.Limit;
 import com.github.dreamroute.others.OrderBy;
 import com.github.dreamroute.others.OrderBy.Order;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import sun.font.TrueTypeFont;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class SelectUtilTest {
+class SelectUtilTest {
 
-    private static List<User> users = new ArrayList<>(3);
+    private static final List<User> users = new ArrayList<>(3);
 
     @BeforeAll
-    public static void initDataTest() {
+    static void initDataTest() {
         User wdh = new User(1L, "w.dehai", "123");
         User dr = new User(2L, "Dreamroute", "456");
         User jd = new User(3L, "Jaedong", null);
@@ -27,7 +31,7 @@ public class SelectUtilTest {
     }
 
     @Test
-    public void commonTest() {
+    void commonTest() {
         Where where = new Where()
                 .andEq("id", 1L)
                 .orEq("name", "Jaedong");
@@ -36,106 +40,117 @@ public class SelectUtilTest {
     }
 
     @Test
-    public void onlyAndTest() {
+    void onlyAndTest() {
         List<User> result = SelectUtil.query(users, new Where().andEq("name", "w.dehai"));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void onlyOrTest() {
+    void onlyOrTest() {
         List<User> result = SelectUtil.query(users, new Where().orEq("name", "w.dehai"));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void betweenTest() {
+    void betweenTest() {
         List<User> result = SelectUtil.query(users, new Where().andBetween("id", 2, 3));
         Assertions.assertEquals(2, result.size());
     }
 
     @Test
-    public void ltTest() {
+    void ltTest() {
         List<User> result = SelectUtil.query(users, new Where().andLT("id", 2));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void lteTest() {
+    void lteTest() {
         List<User> result = SelectUtil.query(users, new Where().andLTE("id", 2));
         Assertions.assertEquals(2, result.size());
     }
 
     @Test
-    public void gtTest() {
+    void gtTest() {
         List<User> result = SelectUtil.query(users, new Where().andGT("id", 2));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void gteTest() {
+    void gteTest() {
         List<User> result = SelectUtil.query(users, new Where().andGTE("id", 2));
         Assertions.assertEquals(2, result.size());
     }
 
     @Test
-    public void likeTest() {
+    void likeTest() {
         List<User> result = SelectUtil.query(users, new Where().andLike("name", "ae"));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void notLikeTest() {
+    void notLikeTest() {
         List<User> result = SelectUtil.query(users, new Where().andNotLike("name", "ae"));
         Assertions.assertEquals(2, result.size());
     }
 
     @Test
-    public void startWithTest() {
+    void startWithTest() {
         List<User> result = SelectUtil.query(users, new Where().andStartWith("name", "w.d"));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void endWithTest() {
+    void endWithTest() {
         List<User> result = SelectUtil.query(users, new Where().andEndWith("name", "dong"));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void inTest() {
+    void inTest() {
         List<User> result = SelectUtil.query(users, new Where().andIn("name", Arrays.asList("w.dehai", "Jaedong")));
         Assertions.assertEquals(2, result.size());
     }
 
     @Test
-    public void notInTest() {
+    void notInTest() {
         List<User> result = SelectUtil.query(users, new Where().andNotIn("name", Arrays.asList("w.dehai", "Jaedong")));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void isNullTest() {
+    void isNullTest() {
         List<User> result = SelectUtil.query(users, new Where().andIsNull("password"));
         Assertions.assertEquals(1, result.size());
     }
 
     @Test
-    public void isNotNullTest() {
+    void isNotNullTest() {
         List<User> result = SelectUtil.query(users, new Where().andIsNotNull("password"));
         Assertions.assertEquals(2, result.size());
     }
 
     @Test
-    public void orderByTest() {
-        // TODO 增加复杂测试
-        List<User> result = SelectUtil.query(users, null, new OrderBy().column("id", Order.DESC));
-        System.err.println(result);
+    void orderByTest() {
+        List<User> result = SelectUtil.query(users, null, new OrderBy().column("id", Order.DESC), null);
+        Long[] ids = result.stream().map(User::getId).toArray(Long[]::new);
+        Assertions.assertArrayEquals(new Long[] {3L, 2L, 1L}, ids);
     }
 
     @Test
-    public void limitTest() {
-        List<User> result = users.stream().limit(2).collect(Collectors.toList());
-        System.err.println(result);
+    void limitTest() {
+        List<User> result = SelectUtil.query(users, null, null, new Limit(2));
+        Assertions.assertEquals(2, result.size());
+    }
+
+    @Test
+    void groupByTest() {
+        Map<Long, List<User>> map = SelectUtil.query(users, null, null, null, new GroupBy("id"));
+        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
+        map.forEach((k, v) -> {
+            Assertions.assertEquals(true, ids.contains(1L));
+            Assertions.assertEquals(true, ids.contains(2L));
+            Assertions.assertEquals(true, ids.contains(3L));
+        });
     }
 
 }

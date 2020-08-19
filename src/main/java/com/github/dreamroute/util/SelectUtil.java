@@ -5,6 +5,8 @@ import com.github.dreamroute.condition.Condition;
 import com.github.dreamroute.condition.In;
 import com.github.dreamroute.enums.Connector;
 import com.github.dreamroute.enums.Symbol;
+import com.github.dreamroute.others.GroupBy;
+import com.github.dreamroute.others.Limit;
 import com.github.dreamroute.others.OrderBy;
 import com.github.dreamroute.others.OrderBy.Order;
 import com.github.dreamroute.others.OrderBy.OrderInfo;
@@ -14,7 +16,9 @@ import org.apache.ibatis.reflection.invoker.Invoker;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,10 +31,26 @@ public class SelectUtil {
     private SelectUtil() {}
 
     public static <T> List<T> query(List<T> data, Where where) {
-        return query(data, where, null);
+        return query(data, where, null, null);
     }
 
-    public static <T> List<T> query(List<T> data, Where where, OrderBy orderBy) {
+    public static <T, E> Map<E, List<T>> query(List<T> data, Where where, OrderBy orderBy, Limit limit, GroupBy groupBy) {
+        List<T> dataList = query(data, where, orderBy, limit);
+        Map<E, List<T>> result = new HashMap<>();
+        if (groupBy != null) {
+            result = dataList.stream().collect(Collectors.groupingBy(e -> {
+                Reflector reflector = new Reflector(e.getClass());
+                try {
+                    return (E) reflector.getGetInvoker(groupBy.getProp()).invoke(e, null);
+                } catch (Exception ee) {
+                    throw new SelectServiceException();
+                }
+            }));
+        }
+        return result;
+    }
+
+    public static <T> List<T> query(List<T> data, Where where, OrderBy orderBy, Limit limit) {
         if (data == null || data.isEmpty()) {
             return Collections.emptyList();
         }
@@ -43,6 +63,12 @@ public class SelectUtil {
             stream = stream.sorted(comparator);
         }
 
+        if (limit != null && limit.getSize() != null) {
+            if (limit.getSize() < 0) {
+                throw new SelectServiceException("limit不能小于0");
+            }
+            stream = stream.limit(limit.getSize());
+        }
         return stream.collect(Collectors.toList());
     }
 
