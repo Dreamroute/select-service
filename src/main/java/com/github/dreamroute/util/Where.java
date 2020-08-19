@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class Where {
 
-    private List<Condition> conditions = new ArrayList<>();
+    private final List<Condition> conditions = new ArrayList<>();
 
     // -- EQ
     public  Where andEq(String key, Object value) {
@@ -63,84 +63,84 @@ public class Where {
 
     // -- lt
     public Where andLT(String key, Object value) {
-        return this.LT(Connector.AND, key, value);
+        return this.lt(Connector.AND, key, value);
     }
 
     public Where orLT(String key, Object value) {
-        return this.LT(Connector.OR, key, value);
+        return this.lt(Connector.OR, key, value);
     }
 
-    private Where LT(Connector connector, String key, Object value) {
+    private Where lt(Connector connector, String key, Object value) {
         conditions.add(new Condition(connector, Symbol.LT, key, value));
         return this;
     }
 
     // -- lte
     public Where andLTE(String key, Object value) {
-        return this.LTE(Connector.AND, key, value);
+        return this.lte(Connector.AND, key, value);
     }
 
     public Where orLTE(String key, Object value) {
-        return this.LTE(Connector.OR, key, value);
+        return this.lte(Connector.OR, key, value);
     }
 
-    private Where LTE(Connector connector, String key, Object value) {
+    private Where lte(Connector connector, String key, Object value) {
         conditions.add(new Condition(connector, Symbol.LTE, key, value));
         return this;
     }
 
     // -- gt
     public Where andGT(String key, Object value) {
-        return this.GT(Connector.AND, key, value);
+        return this.gt(Connector.AND, key, value);
     }
 
     public Where orGT(String key, Object value) {
-        return this.GT(Connector.OR, key, value);
+        return this.gt(Connector.OR, key, value);
     }
 
-    private Where GT(Connector connector, String key, Object value) {
+    private Where gt(Connector connector, String key, Object value) {
         conditions.add(new Condition(connector, Symbol.GT, key, value));
         return this;
     }
 
     // -- gte
     public Where andGTE(String key, Object value) {
-        return this.GTE(Connector.AND, key, value);
+        return this.gte(Connector.AND, key, value);
     }
 
     public Where orGTE(String key, Object value) {
-        return this.GTE(Connector.OR, key, value);
+        return this.gte(Connector.OR, key, value);
     }
 
-    private Where GTE(Connector connector, String key, Object value) {
+    private Where gte(Connector connector, String key, Object value) {
         conditions.add(new Condition(connector, Symbol.GTE, key, value));
         return this;
     }
 
     // -- like
     public Where andLike(String key, String value) {
-        return this.Like(Connector.AND, key, value);
+        return this.like(Connector.AND, key, value);
     }
 
-    private Where orLike(String key, String value) {
-        return this.Like(Connector.OR, key, value);
+    public Where orLike(String key, String value) {
+        return this.like(Connector.OR, key, value);
     }
 
-    private Where Like(Connector connector, String key, Object value) {
+    private Where like(Connector connector, String key, Object value) {
         conditions.add(new Condition(connector, Symbol.Like, key, value));
         return this;
     }
 
     // -- not like
     public Where andNotLike(String key, String value) {
-        return this.NotLike(Connector.AND, key, value);
+        return this.notLike(Connector.AND, key, value);
     }
 
     public Where orNotLike(String key, String value) {
-        return this.NotLike(Connector.OR, key, value);
+        return this.notLike(Connector.OR, key, value);
     }
 
-    private Where NotLike(Connector connector, String key, String value) {
+    private Where notLike(Connector connector, String key, String value) {
         conditions.add(new Condition(connector, Symbol.NotLike, key, value));
         return this;
     }
