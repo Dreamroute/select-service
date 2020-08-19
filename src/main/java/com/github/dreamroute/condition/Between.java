@@ -2,6 +2,7 @@ package com.github.dreamroute.condition;
 
 import com.github.dreamroute.enums.Connector;
 import com.github.dreamroute.enums.Symbol;
+
 import lombok.Data;
 
 /**

@@ -5,6 +5,11 @@ package com.github.dreamroute.util;
  */
 public class SelectServiceException extends RuntimeException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4917807215132180524L;
+    
     public SelectServiceException() {
         super();
     }
